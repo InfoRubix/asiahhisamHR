@@ -36,10 +36,15 @@
     <div id="adminView" class="hidden p-4 sm:p-6 md:p-8">
         <!-- Header -->
         <header class="flex items-center justify-between mb-6">
-            <h1 class="text-2xl md:text-3xl font-bold text-slate-800 flex items-center gap-3">
-                <i class="fa-solid fa-chart-line text-blue-500"></i> Panel Admin
-            </h1>
-            <button id="logoutBtn" class="text-sm text-slate-600 hover:text-blue-500 font-semibold">Log Keluar <i class="fa-solid fa-right-from-bracket ml-1"></i></button>
+            <div class="flex items-center gap-4">
+                <a href="index.html" class="text-slate-500 hover:text-blue-500 transition-all" title="Kembali ke Borang">
+                    <i class="fa-solid fa-arrow-left fa-lg"></i>
+                </a>
+                <h1 class="text-2xl md:text-3xl font-bold text-slate-800 flex items-center gap-3">
+                    <i class="fa-solid fa-chart-line text-blue-500"></i> Panel Admin
+                </h1>
+            </div>
+            <button id="logoutBtn" class="text-sm text-slate-600 hover:text-blue-500 font-semibold transition-all">Log Keluar <i class="fa-solid fa-right-from-bracket ml-1"></i></button>
         </header>
 
         <!-- Summary Cards -->
@@ -68,7 +73,7 @@
 
     <script>
         // --- IMPORTANT ---
-        // PASTE YOUR GOOGLE APPS SCRIPT WEB APP URL HERE
+        // Updated Google Apps Script Web App URL
         const GOOGLE_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbwDFbZGJG3qZUIPa-pkXDwzGNYwziR_ctwDcBYUc9T9MEvGp5BTBQ8HWeOkTQf2K50FHg/exec';
         
         let allSubmissions = [];
