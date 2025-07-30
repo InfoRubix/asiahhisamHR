@@ -1,0 +1,230 @@
+<!DOCTYPE html>
+<html lang="ms">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Panel Admin</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        body { font-family: 'Inter', sans-serif; }
+        .transition-all { transition: all 0.3s ease-in-out; }
+        .modal-bg { background-color: rgba(0,0,0,0.5); }
+        .modal-box { transform: scale(0.95); opacity: 0; }
+        .modal-box.active { transform: scale(1); opacity: 1; }
+    </style>
+</head>
+<body class="bg-slate-100">
+
+    <!-- Login View -->
+    <div id="loginView" class="flex items-center justify-center min-h-screen">
+        <div class="w-full max-w-sm bg-white rounded-2xl shadow-lg p-8">
+            <h1 class="text-2xl font-bold text-center text-slate-800 mb-6">Admin Login</h1>
+            <form id="loginForm">
+                <div class="mb-4">
+                    <label for="email" class="block text-sm font-medium text-slate-700 mb-1">Email</label>
+                    <input type="email" id="email" required class="w-full px-4 py-2.5 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500" placeholder="admin@example.com">
+                </div>
+                <button type="submit" id="loginBtn" class="w-full bg-blue-500 hover:bg-blue-600 text-white font-bold py-3 px-4 rounded-lg">Log Masuk</button>
+            </form>
+            <div id="loginStatus" class="mt-4 text-center text-sm font-medium text-red-600"></div>
+        </div>
+    </div>
+
+    <!-- Admin Panel View -->
+    <div id="adminView" class="hidden p-4 sm:p-6 md:p-8">
+        <!-- Header -->
+        <header class="flex items-center justify-between mb-6">
+            <h1 class="text-2xl md:text-3xl font-bold text-slate-800 flex items-center gap-3">
+                <i class="fa-solid fa-chart-line text-blue-500"></i> Panel Admin
+            </h1>
+            <button id="logoutBtn" class="text-sm text-slate-600 hover:text-blue-500 font-semibold">Log Keluar <i class="fa-solid fa-right-from-bracket ml-1"></i></button>
+        </header>
+
+        <!-- Summary Cards -->
+        <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-6">
+            <div class="bg-white p-5 rounded-xl shadow"><h2 class="text-sm font-medium text-slate-500">Jumlah Maklum Balas</h2><p id="totalCount" class="text-3xl font-bold text-slate-800 mt-1">0</p></div>
+            <div class="bg-white p-5 rounded-xl shadow"><h2 class="text-sm font-medium text-slate-500">Sentimen Positif</h2><p id="positiveCount" class="text-3xl font-bold text-green-500 mt-1">0</p></div>
+            <div class="bg-white p-5 rounded-xl shadow"><h2 class="text-sm font-medium text-slate-500">Sentimen Negatif</h2><p id="negativeCount" class="text-3xl font-bold text-red-500 mt-1">0</p></div>
+        </div>
+
+        <!-- Search and Filters -->
+        <div class="flex flex-col sm:flex-row items-center justify-between gap-4 mb-4">
+            <div class="relative w-full sm:w-auto flex-grow"><i class="fa-solid fa-search absolute left-4 top-1/2 -translate-y-1/2 text-slate-400"></i><input type="text" id="searchInput" class="w-full pl-10 pr-4 py-2.5 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500" placeholder="Cari maklum balas..."></div>
+            <div class="flex items-center gap-2">
+                <button data-filter="Semua" class="filter-btn bg-blue-500 text-white px-4 py-2 rounded-lg text-sm font-semibold">Semua</button>
+                <button data-filter="Maklum Balas" class="filter-btn bg-white text-slate-600 px-4 py-2 rounded-lg text-sm font-semibold">Maklum Balas</button>
+                <button data-filter="Aduan" class="filter-btn bg-white text-slate-600 px-4 py-2 rounded-lg text-sm font-semibold">Aduan</button>
+            </div>
+        </div>
+
+        <!-- Submissions List -->
+        <div id="submissionsList" class="space-y-4"></div>
+    </div>
+
+    <!-- Modal -->
+    <div id="messageModal" class="fixed inset-0 z-50 items-center justify-center hidden p-4 transition-all modal-bg"><div class="relative w-full max-w-2xl bg-white rounded-xl shadow-lg p-6 transition-all modal-box"><button id="closeModalBtn" class="absolute top-4 right-4 text-slate-500 hover:text-slate-800"><i class="fa-solid fa-times fa-lg"></i></button><h2 id="modalTitle" class="text-xl font-bold text-slate-800 mb-2"></h2><p id="modalType" class="text-sm font-semibold mb-1"></p><p id="modalDate" class="text-xs text-slate-500 mb-4"></p><div id="modalMessage" class="text-slate-700 leading-relaxed max-h-[60vh] overflow-y-auto"></div></div></div>
+
+    <script>
+        // --- IMPORTANT ---
+        // PASTE YOUR GOOGLE APPS SCRIPT WEB APP URL HERE
+        const GOOGLE_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbwmL0IoYWY088aInLXZtAEcxj7-QlOcDWyvmPoDRSdGH7atKGPMw_lmyxbY5_0z5HmzxA/exec';
+        
+        let allSubmissions = [];
+
+        document.addEventListener('DOMContentLoaded', () => {
+            const loginView = document.getElementById('loginView');
+            const adminView = document.getElementById('adminView');
+            const loginForm = document.getElementById('loginForm');
+            const logoutBtn = document.getElementById('logoutBtn');
+
+            if (sessionStorage.getItem('adminToken')) {
+                loginView.style.display = 'none';
+                adminView.style.display = 'block';
+                fetchData();
+            }
+
+            loginForm.addEventListener('submit', (e) => {
+                e.preventDefault();
+                const email = document.getElementById('email').value;
+                const loginBtn = document.getElementById('loginBtn');
+                const loginStatus = document.getElementById('loginStatus');
+                loginBtn.disabled = true;
+                loginBtn.textContent = 'Mengesahkan...';
+                loginStatus.textContent = '';
+
+                fetch(GOOGLE_SCRIPT_URL, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                    body: new URLSearchParams({ action: 'login', email: email })
+                })
+                .then(res => res.json())
+                .then(data => {
+                    if (data.success && data.token) {
+                        sessionStorage.setItem('adminToken', data.token);
+                        loginView.style.display = 'none';
+                        adminView.style.display = 'block';
+                        fetchData();
+                    } else {
+                        throw new Error(data.message || 'Akses ditolak.');
+                    }
+                })
+                .catch(err => {
+                    loginStatus.textContent = err.message;
+                })
+                .finally(() => {
+                    loginBtn.disabled = false;
+                    loginBtn.textContent = 'Log Masuk';
+                });
+            });
+            
+            logoutBtn.addEventListener('click', () => {
+                sessionStorage.removeItem('adminToken');
+                location.reload();
+            });
+
+            const searchInput = document.getElementById('searchInput');
+            const filterBtns = document.querySelectorAll('.filter-btn');
+            searchInput.addEventListener('input', () => renderData(allSubmissions));
+            filterBtns.forEach(btn => {
+                btn.addEventListener('click', () => {
+                    filterBtns.forEach(b => b.classList.replace('bg-blue-500', 'bg-white') || b.classList.replace('text-white', 'text-slate-600'));
+                    btn.classList.replace('bg-white', 'bg-blue-500');
+                    btn.classList.replace('text-slate-600', 'text-white');
+                    renderData(allSubmissions);
+                });
+            });
+        });
+
+        function fetchData() {
+            const listContainer = document.getElementById('submissionsList');
+            listContainer.innerHTML = `<div class="text-center p-8 bg-white rounded-lg shadow">Memuatkan data...</div>`;
+            const token = sessionStorage.getItem('adminToken');
+
+            fetch(`${GOOGLE_SCRIPT_URL}?action=getSubmissions&token=${token}`)
+                .then(res => res.json())
+                .then(data => {
+                    if (data.success) {
+                        allSubmissions = data.data.reverse();
+                        renderData(allSubmissions);
+                        updateSummaryCards(allSubmissions);
+                    } else {
+                        throw new Error(data.message || 'Sesi tamat. Sila log masuk semula.');
+                    }
+                })
+                .catch(err => {
+                    listContainer.innerHTML = `<div class="text-center p-8 bg-white rounded-lg shadow text-red-500">Gagal memuatkan data: ${err.message}</div>`;
+                    if (err.message.includes('Sesi')) {
+                        setTimeout(() => {
+                            sessionStorage.removeItem('adminToken');
+                            location.reload();
+                        }, 2000);
+                    }
+                });
+        }
+
+        function updateSummaryCards(data) {
+            document.getElementById('totalCount').textContent = data.length;
+            document.getElementById('positiveCount').textContent = data.filter(s => s.sentiment === 'Positif').length;
+            document.getElementById('negativeCount').textContent = data.filter(s => s.sentiment === 'Negatif').length;
+        }
+
+        function renderData(data) {
+            const listContainer = document.getElementById('submissionsList');
+            const searchTerm = document.getElementById('searchInput').value.toLowerCase();
+            const activeFilter = document.querySelector('.filter-btn.bg-blue-500').dataset.filter;
+
+            const filteredData = data.filter(item => {
+                const typeMatch = activeFilter === 'Semua' || item.type === activeFilter;
+                const searchMatch = item.subject.toLowerCase().includes(searchTerm) || item.message.toLowerCase().includes(searchTerm);
+                return typeMatch && searchMatch;
+            });
+
+            if (filteredData.length === 0) {
+                listContainer.innerHTML = '<div class="text-center p-8 bg-white rounded-lg shadow">Tiada data ditemui.</div>';
+                return;
+            }
+
+            listContainer.innerHTML = filteredData.map(item => {
+                const sentimentColor = item.sentiment === 'Negatif' ? 'red' : (item.sentiment === 'Positif' ? 'green' : 'gray');
+                const typeColor = item.type === 'Aduan' ? 'red' : 'blue';
+                return `
+                <div class="bg-white p-5 rounded-lg shadow cursor-pointer hover:shadow-md" onclick='openModal(${JSON.stringify(item)})'>
+                    <div class="flex items-start justify-between gap-4">
+                        <div class="flex-grow">
+                             <h3 class="font-bold text-slate-800 mb-1">${item.subject}</h3>
+                             <p class="text-sm text-slate-600 leading-relaxed line-clamp-2">${item.message}</p>
+                        </div>
+                        <div class="flex-shrink-0 flex flex-col items-end gap-2">
+                           <span class="text-xs font-semibold px-2.5 py-0.5 rounded-full bg-${sentimentColor}-100 text-${sentimentColor}-800">${item.sentiment || 'Neutral'}</span>
+                           <span class="text-xs font-semibold px-2.5 py-0.5 rounded-full bg-${typeColor}-100 text-${typeColor}-800">${item.type}</span>
+                        </div>
+                    </div>
+                    <p class="text-xs text-slate-400 mt-3">${new Date(item.timestamp).toLocaleString('ms-MY')}</p>
+                </div>`;
+            }).join('');
+        }
+        
+        const modal = document.getElementById('messageModal');
+        const closeModalBtn = document.getElementById('closeModalBtn');
+        
+        function openModal(item) {
+            document.getElementById('modalTitle').textContent = item.subject;
+            document.getElementById('modalDate').textContent = new Date(item.timestamp).toLocaleString('ms-MY');
+            document.getElementById('modalMessage').textContent = item.message;
+            const modalType = document.getElementById('modalType');
+            modalType.textContent = item.type;
+            modalType.className = `text-sm font-semibold mb-1 ${item.type === 'Aduan' ? 'text-red-600' : 'text-blue-600'}`;
+            modal.classList.replace('hidden', 'flex');
+            setTimeout(() => modal.querySelector('.modal-box').classList.add('active'), 10);
+        }
+        closeModalBtn.addEventListener('click', closeModal);
+        modal.addEventListener('click', (e) => { if (e.target === modal) closeModal(); });
+        function closeModal() {
+            modal.querySelector('.modal-box').classList.remove('active');
+            setTimeout(() => modal.classList.replace('flex', 'hidden'), 300);
+        }
+    </script>
+</body>
+</html>
