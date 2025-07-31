@@ -85,3 +85,13 @@ For any technical questions or issues, contact **RUBIX TECHNOLOGY**.
 ---
 
 *This system is specifically designed to facilitate communication between employees and the HR department in an efficient and secure manner.*
+
+---
+
+## License & Terms
+
+This software is proprietary to RUBIX TECHNOLOGY. Unauthorized reproduction, distribution, or modification is prohibited. For licensing inquiries, please contact RUBIX TECHNOLOGY directly.
+
+---
+
+**© 2025 RUBIX TECHNOLOGY. All right reserved.**
