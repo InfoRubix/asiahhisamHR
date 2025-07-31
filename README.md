@@ -1,27 +1,27 @@
-# Sistem Maklumbalas dan Aduan HR
+# HR Feedback and Complaints System
 
-**Dibina oleh RUBIX TECHNOLOGY**
+**Built by RUBIX TECHNOLOGY**
 
-Sistem web yang memudahkan pekerja untuk menghantar maklumbalas dan aduan kepada jabatan HR dengan antara muka yang mesra pengguna dan panel admin untuk pengurusan.
+A web system that makes it easy for employees to send feedback and complaints to the HR department with a user-friendly interface and admin panel for management.
 
-## Ciri-ciri Utama
+## Key Features
 
-### Portal Pengguna (index.html)
-- ✅ Borang dwi-fungsi (Maklumbalas & Aduan)
-- ✅ Antara muka responsif dengan Tailwind CSS
-- ✅ Penyerahkan data ke Google Sheets melalui Google Apps Script
-- ✅ Maklumbalas masa nyata untuk pengguna
-- ✅ Sokongan Bahasa Malaysia
+### User Portal (index.html)
+- ✅ Dual-function form (Feedback & Complaints)
+- ✅ Responsive interface with Tailwind CSS
+- ✅ Submit data to Google Sheets via Google Apps Script
+- ✅ Real-time feedback for users
+- ✅ Bahasa Malaysia support
 
-### Panel Admin (admin.html)
-- 🔐 Sistem login berasaskan email
-- 📊 Dashboard dengan statistik ringkasan
-- 🔍 Fungsi carian dan penapisan data
-- 👁️ Paparan detail dalam modal popup
-- 📈 Analisis sentimen automatik (Positif/Negatif)
-- 🔄 Data masa nyata dari Google Sheets
+### Administrator Panel (admin.html)
+- 🔐 Email-based login system
+- 📊 Dashboard with summary statistics
+- 🔍 Data search and filtering functionality
+- 👁️ Detailed view in popup modal
+- 📈 Automatic sentiment analysis (Positive/Negative)
+- 🔄 Real-time data from Google Sheets
 
-## Teknologi yang Digunakan
+## Tech Stack
 
 - **Frontend**: HTML5, CSS3, JavaScript (Vanilla)
 - **Styling**: Tailwind CSS, Font Awesome Icons
@@ -29,59 +29,59 @@ Sistem web yang memudahkan pekerja untuk menghantar maklumbalas dan aduan kepada
 - **Database**: Google Sheets
 - **Font**: Inter (Google Fonts)
 
-## Struktur Fail
+## File Structure
 
 ```
 asiahhisamHR/
-├── index.html      # Portal utama untuk pengguna
-├── admin.html      # Panel admin untuk HR
-└── README.md       # Dokumentasi sistem
+├── index.html      # Main portal for users
+├── admin.html      # Admin panel for HR
+└── README.md       # System documentation
 ```
 
-## Cara Penggunaan
+## How to Use
 
-### Untuk Pengguna
-1. Buka `index.html` dalam pelayar web
-2. Pilih tab "Maklum Balas" atau "Aduan"
-3. Isi tajuk dan mesej
-4. Klik butang hantar
+### For Users
+1. Open index.html in a web browser
+2. Select the "Feedback" or "Complaint" tab
+3. Fill in the subject and message
+4. Click the send button
 
-### Untuk Admin HR
-1. Buka `admin.html` dalam pelayar web
-2. Log masuk dengan email yang dibenarkan
-3. Lihat dashboard dengan statistik
-4. Gunakan carian dan penapisan untuk mencari data
-5. Klik pada sebarang item untuk melihat butiran penuh
+### For HR Admins
+1. Open `admin.html` in a web browser
+2. Log in with an authorized email
+3. View dashboard with statistics
+4. Use search and filtering to find data
+5. Click on any item to see full details
 
-## Keperluan Sistem
+## System Requirements
 
-- Pelayar web moden (Chrome, Firefox, Safari, Edge)
-- Sambungan internet aktif
-- Google Apps Script yang dikonfigurasi dengan betul
+- Modern web browser (Chrome, Firefox, Safari, Edge)
+- Active internet connection
+- Properly configured Google Apps Script
 
-## Konfigurasi
+## Configuration
 
-Sistem ini memerlukan Google Apps Script yang telah dikonfigurasi untuk:
-- Menerima data dari borang
-- Menyimpan data dalam Google Sheets
-- Mengesahkan admin berdasarkan email
-- Menyediakan API untuk panel admin
+This system requires a properly configured Google Apps Script to:
+- Receive data from forms
+- Store data in Google Sheets
+- Authenticate admins based on email
+- Provide API for panel admins
 
-URL Google Apps Script perlu dikemaskini dalam kedua-dua fail HTML:
+The Google Apps Script URL needs to be updated in both HTML files:
 ```javascript
 const GOOGLE_SCRIPT_URL = 'YOUR_GOOGLE_SCRIPT_URL_HERE';
 ```
 
-## Keselamatan
+## Security
 
-- Autentikasi admin melalui email dan token sesi
-- Validasi data pada sisi klien dan pelayan
-- Sesi automatik tamat tempoh untuk keselamatan
+- Admin authentication via email and session token
+- Data validation on both client and server sides
+- Automatic session expiration for security
 
-## Sokongan
+## Support
 
-Untuk sebarang pertanyaan atau masalah teknikal, hubungi **RUBIX TECHNOLOGY**.
+For any technical questions or issues, contact **RUBIX TECHNOLOGY**.
 
 ---
 
-*Sistem ini direka khusus untuk memudahkan komunikasi antara pekerja dan jabatan HR dengan cara yang cekap dan selamat.*
+*This system is specifically designed to facilitate communication between employees and the HR department in an efficient and secure manner.*
