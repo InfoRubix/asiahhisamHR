@@ -61,10 +61,16 @@
         </div>
     </div>
 
+    <script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
     <script>
         // --- IMPORTANT ---
         // Updated Google Apps Script Web App URL
         const GOOGLE_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbxMoFwUjHWomNX-KuN9D-C1zbY74hb8CVlWjrrig4Wi1LXHr9wc7NaE0Pga1YYfDtT6vw/exec';
+
+        // --- EmailJS Config ---
+        const EMAILJS_SERVICE_ID = 'service_7po3l6i';
+        const EMAILJS_TEMPLATE_ID = 'template_xr8wuh8';
+        const EMAILJS_PUBLIC_KEY = 'EEUzHVQrxMGO0Yqgw';
 
         document.addEventListener('DOMContentLoaded', function () {
             const form = document.getElementById('feedbackForm');
@@ -91,6 +97,13 @@
                     body: formData
                 })
                 .then(() => {
+                    // Send email notification via EmailJS
+                    emailjs.send(EMAILJS_SERVICE_ID, EMAILJS_TEMPLATE_ID, {
+                        form_type: formData.get('formType'),
+                        subject: formData.get('subject'),
+                        message: formData.get('message')
+                    }, EMAILJS_PUBLIC_KEY).catch(err => console.error('EmailJS error:', err));
+
                     displayMessage('Terima kasih! Maklum balas anda telah dihantar.', 'success');
                     form.reset();
                     switchTab('feedback');

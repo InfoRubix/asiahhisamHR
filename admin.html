@@ -26,6 +26,10 @@
                     <label for="email" class="block text-sm font-medium text-slate-700 mb-1">Email</label>
                     <input type="email" id="email" required class="w-full px-4 py-2.5 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500" placeholder="admin@example.com">
                 </div>
+                <div class="mb-4">
+                    <label for="password" class="block text-sm font-medium text-slate-700 mb-1">Kata Laluan</label>
+                    <input type="password" id="password" required class="w-full px-4 py-2.5 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500" placeholder="Masukkan kata laluan">
+                </div>
                 <button type="submit" id="loginBtn" class="w-full bg-blue-500 hover:bg-blue-600 text-white font-bold py-3 px-4 rounded-lg">Log Masuk</button>
             </form>
             <div id="loginStatus" class="mt-4 text-center text-sm font-medium text-red-600"></div>
@@ -79,7 +83,19 @@
 
     <script>
         const GOOGLE_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbxMoFwUjHWomNX-KuN9D-C1zbY74hb8CVlWjrrig4Wi1LXHr9wc7NaE0Pga1YYfDtT6vw/exec'; // This URL might need updating after you re-deploy
-        
+
+        // --- PASSWORD HASH ---
+        // Tukar hash ni nanti. Guna console: hashPassword('yourpassword').then(h => console.log(h))
+        const ADMIN_PASSWORD_HASH = '240be518fabd2724ddb6f04eeb1da5967448d7e831c08c8fa822809f74c720a9';
+
+        async function hashPassword(password) {
+            const encoder = new TextEncoder();
+            const data = encoder.encode(password);
+            const hashBuffer = await crypto.subtle.digest('SHA-256', data);
+            const hashArray = Array.from(new Uint8Array(hashBuffer));
+            return hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
+        }
+
         let allSubmissions = [];
 
         document.addEventListener('DOMContentLoaded', () => {
@@ -94,14 +110,24 @@
                 fetchData();
             }
 
-            loginForm.addEventListener('submit', (e) => {
+            loginForm.addEventListener('submit', async (e) => {
                 e.preventDefault();
                 const email = document.getElementById('email').value;
+                const password = document.getElementById('password').value;
                 const loginBtn = document.getElementById('loginBtn');
                 const loginStatus = document.getElementById('loginStatus');
                 loginBtn.disabled = true;
                 loginBtn.textContent = 'Mengesahkan...';
                 loginStatus.textContent = '';
+
+                // Check password locally first
+                const passwordHash = await hashPassword(password);
+                if (passwordHash !== ADMIN_PASSWORD_HASH) {
+                    loginStatus.textContent = 'Kata laluan salah.';
+                    loginBtn.disabled = false;
+                    loginBtn.textContent = 'Log Masuk';
+                    return;
+                }
 
                 fetch(GOOGLE_SCRIPT_URL, {
                     method: 'POST',
