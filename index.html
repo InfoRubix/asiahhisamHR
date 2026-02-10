@@ -91,6 +91,13 @@
 
                 const formData = new FormData(form);
 
+                // Capture values before fetch consumes formData
+                const emailParams = {
+                    form_type: formData.get('formType'),
+                    subject: formData.get('subject'),
+                    message: formData.get('message')
+                };
+
                 fetch(GOOGLE_SCRIPT_URL, {
                     method: 'POST',
                     mode: 'no-cors',
@@ -98,11 +105,8 @@
                 })
                 .then(() => {
                     // Send email notification via EmailJS
-                    emailjs.send(EMAILJS_SERVICE_ID, EMAILJS_TEMPLATE_ID, {
-                        form_type: formData.get('formType'),
-                        subject: formData.get('subject'),
-                        message: formData.get('message')
-                    }, EMAILJS_PUBLIC_KEY).catch(err => console.error('EmailJS error:', err));
+                    emailjs.send(EMAILJS_SERVICE_ID, EMAILJS_TEMPLATE_ID, emailParams, EMAILJS_PUBLIC_KEY)
+                        .catch(err => console.error('EmailJS error:', err));
 
                     displayMessage('Terima kasih! Maklum balas anda telah dihantar.', 'success');
                     form.reset();
